@@ -1,0 +1,10 @@
+{
+  "deploy": {
+    "buildCommand": "npm run build",
+    "startCommand": "npm start"
+  },
+  "environment": {
+    "NODE_ENV": "production",
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "false"
+  }
+}

@@ -1,0 +1,25 @@
+# Configuración para Render.com
+# 1. Ve a https://render.com
+# 2. Conecta tu repositorio de GitHub  
+# 3. Selecciona "Web Service"
+# 4. Usa esta configuración:
+
+# Build Command: npm install && npm run build
+# Start Command: npm start
+
+# Environment Variables:
+# NODE_ENV=production
+# PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+
+services:
+  - type: web
+    name: whatsapp-bulk-messenger
+    env: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: false

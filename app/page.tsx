@@ -78,97 +78,191 @@ export default function WhatsAppBulkMessenger() {
       const result = await response.json()
 
       if (response.ok) {
-        if (result.error && result.error.includes('Funcionalidad no disponible en producción')) {
-          // Modo producción - mostrar mensajes personalizados
-          setCurrentProgress("✅ Mensajes generados para modo manual")
-          
-          // Crear ventana emergente con los mensajes personalizados
-          const newWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes')
-          if (newWindow) {
-            newWindow.document.write(`
-              <!DOCTYPE html>
-              <html>
-                <head>
-                  <title>Mensajes WhatsApp - Modo Manual</title>
-                  <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
-                    .message-block { 
-                      background: #f5f5f5; 
-                      padding: 15px; 
-                      margin: 10px 0; 
-                      border-radius: 8px; 
-                      border-left: 4px solid #25D366;
-                    }
-                    .copy-btn { 
-                      background: #25D366; 
-                      color: white; 
-                      border: none; 
-                      padding: 8px 15px; 
-                      cursor: pointer; 
-                      border-radius: 4px; 
-                      margin-top: 10px;
-                    }
-                    .copy-btn:hover { background: #20c157; }
-                    .contact-header { 
-                      font-weight: bold; 
-                      color: #333; 
-                      margin-bottom: 10px; 
-                      font-size: 16px;
-                    }
-                    .instructions {
-                      background: #e3f2fd;
-                      padding: 15px;
-                      border-radius: 8px;
-                      margin-bottom: 20px;
-                    }
-                  </style>
-                </head>
-                <body>
-                  <div class="instructions">
-                    <h2>📱 Instrucciones - Modo Manual</h2>
-                    <p><strong>1.</strong> Abre <a href="https://web.whatsapp.com" target="_blank">WhatsApp Web</a></p>
-                    <p><strong>2.</strong> Copia cada mensaje usando el botón "Copiar"</p>
-                    <p><strong>3.</strong> Busca el contacto y pega el mensaje personalizado</p>
-                    <p><strong>4.</strong> Envía el mensaje y repite con el siguiente</p>
-                  </div>
-                  
-                  <h2>💬 Mensajes Personalizados (${contacts.length} contactos)</h2>
-                  
-                  ${result.results.map((item: any, index: number) => `
-                    <div class="message-block">
-                      <div class="contact-header">
-                        ${index + 1}. ${item.contact} - ${item.phone}
+          if (result.error && result.error.includes('Funcionalidad no disponible en entorno serverless')) {
+            // Modo producción - mostrar mensajes personalizados Y opciones de deploy
+            setCurrentProgress("⚠️ Entorno serverless detectado - Ver opciones de automatización")
+            
+            // Crear ventana emergente con opciones de migración y mensajes
+            const newWindow = window.open('', '_blank', 'width=900,height=700,scrollbars=yes')
+            if (newWindow) {
+              newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <title>WhatsApp Bulk Messenger - Opciones de Automatización</title>
+                    <style>
+                      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 20px; line-height: 1.6; background: #f5f5f5; }
+                      .container { max-width: 800px; margin: 0 auto; }
+                      .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 30px; }
+                      .deployment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+                      .option-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid transparent; transition: all 0.3s ease; }
+                      .option-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+                      .option-card.recommended { border-color: #10b981; }
+                      .option-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+                      .option-header h3 { margin: 0; color: #333; }
+                      .badge { background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+                      .badge.free { background: #3b82f6; }
+                      .badge.paid { background: #f59e0b; }
+                      .deploy-btn { 
+                        background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+                        color: white; 
+                        border: none; 
+                        padding: 12px 24px; 
+                        border-radius: 8px; 
+                        cursor: pointer; 
+                        font-weight: bold;
+                        text-decoration: none;
+                        display: inline-block;
+                        margin-top: 15px;
+                        transition: all 0.3s ease;
+                      }
+                      .deploy-btn:hover { transform: scale(1.05); }
+                      .manual-section { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                      .message-block { 
+                        background: #f8fafc; 
+                        padding: 15px; 
+                        margin: 10px 0; 
+                        border-radius: 8px; 
+                        border-left: 4px solid #25D366;
+                      }
+                      .copy-btn { 
+                        background: #25D366; 
+                        color: white; 
+                        border: none; 
+                        padding: 8px 15px; 
+                        cursor: pointer; 
+                        border-radius: 4px; 
+                        margin-top: 10px;
+                        transition: all 0.3s ease;
+                      }
+                      .copy-btn:hover { background: #20c157; transform: scale(1.05); }
+                      .contact-header { 
+                        font-weight: bold; 
+                        color: #333; 
+                        margin-bottom: 10px; 
+                        font-size: 16px;
+                      }
+                      .pro-tip { background: #eff6ff; border: 1px solid #bfdbfe; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="container">
+                      <div class="hero">
+                        <h1>🚀 WhatsApp Bulk Messenger</h1>
+                        <p>Tu aplicación está en un entorno serverless que no soporta navegadores.</p>
+                        <p><strong>¡Pero tenemos soluciones automáticas para ti!</strong></p>
                       </div>
-                      <div id="message-${index}">
-                        ${item.personalizedMessage.replace(/\n/g, '<br>')}
+                      
+                      <h2>🎯 Opciones para Envío Automático Completo</h2>
+                      
+                      <div class="deployment-options">
+                        <div class="option-card recommended">
+                          <div class="option-header">
+                            <h3>🚂 Railway.app</h3>
+                            <span class="badge">RECOMENDADO</span>
+                            <span class="badge free">GRATIS</span>
+                          </div>
+                          <ul>
+                            <li>✅ Deploy en 30 segundos</li>
+                            <li>✅ Soporte completo para Puppeteer</li>
+                            <li>✅ Configuración automática</li>
+                            <li>✅ Plan gratuito generoso</li>
+                          </ul>
+                          <a href="https://railway.app" target="_blank" class="deploy-btn">🚀 Deploy en Railway</a>
+                        </div>
+                        
+                        <div class="option-card">
+                          <div class="option-header">
+                            <h3>🎨 Render.com</h3>
+                            <span class="badge free">GRATIS</span>
+                          </div>
+                          <ul>
+                            <li>✅ Plan gratuito robusto</li>
+                            <li>✅ SSL automático</li>
+                            <li>✅ Deploy desde GitHub</li>
+                            <li>⚡ Configuración manual</li>
+                          </ul>
+                          <a href="https://render.com" target="_blank" class="deploy-btn">🎨 Deploy en Render</a>
+                        </div>
+                        
+                        <div class="option-card">
+                          <div class="option-header">
+                            <h3>🐳 DigitalOcean</h3>
+                            <span class="badge paid">$5/mes</span>
+                          </div>
+                          <ul>
+                            <li>✅ Máxima compatibilidad</li>
+                            <li>✅ Escalable</li>
+                            <li>✅ Dockerfile incluido</li>
+                            <li>💼 Para uso profesional</li>
+                          </ul>
+                          <a href="https://www.digitalocean.com/products/app-platform" target="_blank" class="deploy-btn">🐳 Deploy en DO</a>
+                        </div>
+                        
+                        <div class="option-card">
+                          <div class="option-header">
+                            <h3>🖥️ Desarrollo Local</h3>
+                            <span class="badge free">GRATIS</span>
+                          </div>
+                          <ul>
+                            <li>✅ Funciona al 100%</li>
+                            <li>✅ Sin limitaciones</li>
+                            <li>✅ Para pruebas</li>
+                            <li>💻 Solo en tu PC</li>
+                          </ul>
+                          <div style="margin-top: 15px; font-family: monospace; background: #1f2937; color: #e5e7eb; padding: 10px; border-radius: 6px; font-size: 14px;">
+                            npm run dev
+                          </div>
+                        </div>
                       </div>
-                      <button class="copy-btn" onclick="copyMessage(${index})">
-                        📋 Copiar Mensaje
-                      </button>
+                      
+                      <div class="pro-tip">
+                        <h3>💡 Recomendación</h3>
+                        <p><strong>Para automatización completa:</strong> Usa Railway.app - es gratis y funciona en 30 segundos.</p>
+                        <p><strong>Para desarrollo:</strong> Ejecuta localmente con <code>npm run dev</code>.</p>
+                      </div>
+                      
+                      <div class="manual-section">
+                        <h2>� Mensajes Manuales (Mientras tanto)</h2>
+                        <p><strong>Instrucciones:</strong> Abre <a href="https://web.whatsapp.com" target="_blank">WhatsApp Web</a>, busca cada contacto y pega el mensaje personalizado.</p>
+                        
+                        ${result.results.map((item: any, index: number) => `
+                          <div class="message-block">
+                            <div class="contact-header">
+                              ${index + 1}. ${item.contact} - ${item.phone}
+                            </div>
+                            <div id="message-${index}">
+                              ${item.personalizedMessage.replace(/\n/g, '<br>')}
+                            </div>
+                            <button class="copy-btn" onclick="copyMessage(${index})">
+                              📋 Copiar Mensaje
+                            </button>
+                          </div>
+                        `).join('')}
+                      </div>
                     </div>
-                  `).join('')}
-                  
-                  <script>
-                    function copyMessage(index) {
-                      const messageElement = document.getElementById('message-' + index);
-                      const text = messageElement.innerText;
-                      navigator.clipboard.writeText(text).then(() => {
-                        const btn = event.target;
-                        btn.textContent = '✅ Copiado!';
-                        btn.style.background = '#4CAF50';
-                        setTimeout(() => {
-                          btn.textContent = '📋 Copiar Mensaje';
-                          btn.style.background = '#25D366';
-                        }, 2000);
-                      });
-                    }
-                  </script>
-                </body>
-              </html>
-            `)
-            newWindow.document.close()
-          }
-        } else {
+                    
+                    <script>
+                      function copyMessage(index) {
+                        const messageElement = document.getElementById('message-' + index);
+                        const text = messageElement.innerText;
+                        navigator.clipboard.writeText(text).then(() => {
+                          const btn = event.target;
+                          btn.textContent = '✅ Copiado!';
+                          btn.style.background = '#10b981';
+                          setTimeout(() => {
+                            btn.textContent = '📋 Copiar Mensaje';
+                            btn.style.background = '#25D366';
+                          }, 2000);
+                        });
+                      }
+                    </script>
+                  </body>
+                </html>
+              `)
+              newWindow.document.close()
+            }
+          } else {
           setCurrentProgress("¡Envío automático completado!")
         }
       } else {

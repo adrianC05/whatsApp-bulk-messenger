@@ -7,7 +7,7 @@
     "build": "next build", 
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "if [ \"$VERCEL\" = \"1\" ]; then echo 'Skipping Puppeteer in production'; else echo 'Development build'; fi"
+    "postinstall": "if [ \"$VERCEL\" = \"1\" ]; then echo 'Skipping Puppeteer in Vercel'; else echo 'Installing Puppeteer for production'; fi"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
