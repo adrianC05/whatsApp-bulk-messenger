@@ -1,6 +1,10 @@
 # Usar imagen de Node con soporte para navegadores
 FROM node:18-bullseye
 
+# Metadata
+LABEL maintainer="adrianC05"
+LABEL description="WhatsApp Bulk Messenger with Puppeteer support"
+
 # Instalar dependencias del sistema necesarias para Puppeteer
 RUN apt-get update && apt-get install -y \
     wget \
@@ -57,11 +61,11 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Copiar archivos de dependencias primero (para cache de Docker)
 COPY package*.json ./
 
 # Instalar dependencias
-RUN npm ci --only=production
+RUN npm install --omit=dev --legacy-peer-deps
 
 # Copiar código de la aplicación
 COPY . .
@@ -77,6 +81,12 @@ RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
 
 USER pptruser
 
+# Exponer puerto
 EXPOSE 3000
 
+# Variables de entorno
+ENV NODE_ENV=production
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=false
+
+# Comando de inicio
 CMD ["npm", "start"]
