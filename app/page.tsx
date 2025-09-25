@@ -316,11 +316,6 @@ export default function WhatsAppBulkMessenger() {
                   🌐 Modo Producción (Manual)
                 </Badge>
               )}
-              {typeof window !== 'undefined' && window.location.hostname.includes('localhost') && (
-                <Badge variant="outline" className="text-sm border-green-300 text-green-700 dark:text-green-300">
-                  🔧 Modo Desarrollo (Automático)
-                </Badge>
-              )}
             </div>
           </div>
 
@@ -514,13 +509,13 @@ export default function WhatsAppBulkMessenger() {
                         <Button
                           onClick={handleSendMessagesAutomatic}
                           size="lg"
-                          className="gradient-primary text-white px-8"
+                          className="gradient-primary text-black px-8"
                           disabled={contacts.length === 0 || !message.trim()}
                         >
                           <Play className="h-5 w-5 mr-2" />
                           Enviar con Puppeteer
                         </Button>
-                        <div className="text-center text-xs text-muted-foreground">
+                        <div className="text-center text-xs text-muted-foreground ">
                           <p>Automatización completa con Chrome independiente</p>
                         </div>
                       </div>
