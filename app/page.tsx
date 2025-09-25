@@ -60,7 +60,7 @@ export default function WhatsAppBulkMessenger() {
     }
 
     setIsSending(true)
-    setCurrentProgress("Iniciando proceso automático con Puppeteer...")
+    setCurrentProgress("Iniciando proceso...")
 
     try {
       const response = await fetch('/api/send-whatsapp', {
@@ -75,18 +75,109 @@ export default function WhatsAppBulkMessenger() {
         }),
       })
 
+      const result = await response.json()
+
       if (response.ok) {
-        const result = await response.json()
-        setCurrentProgress("¡Envío automático completado!")
-        alert('¡Mensajes enviados exitosamente!')
+        if (result.error && result.error.includes('Funcionalidad no disponible en producción')) {
+          // Modo producción - mostrar mensajes personalizados
+          setCurrentProgress("✅ Mensajes generados para modo manual")
+          
+          // Crear ventana emergente con los mensajes personalizados
+          const newWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes')
+          if (newWindow) {
+            newWindow.document.write(`
+              <!DOCTYPE html>
+              <html>
+                <head>
+                  <title>Mensajes WhatsApp - Modo Manual</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+                    .message-block { 
+                      background: #f5f5f5; 
+                      padding: 15px; 
+                      margin: 10px 0; 
+                      border-radius: 8px; 
+                      border-left: 4px solid #25D366;
+                    }
+                    .copy-btn { 
+                      background: #25D366; 
+                      color: white; 
+                      border: none; 
+                      padding: 8px 15px; 
+                      cursor: pointer; 
+                      border-radius: 4px; 
+                      margin-top: 10px;
+                    }
+                    .copy-btn:hover { background: #20c157; }
+                    .contact-header { 
+                      font-weight: bold; 
+                      color: #333; 
+                      margin-bottom: 10px; 
+                      font-size: 16px;
+                    }
+                    .instructions {
+                      background: #e3f2fd;
+                      padding: 15px;
+                      border-radius: 8px;
+                      margin-bottom: 20px;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="instructions">
+                    <h2>📱 Instrucciones - Modo Manual</h2>
+                    <p><strong>1.</strong> Abre <a href="https://web.whatsapp.com" target="_blank">WhatsApp Web</a></p>
+                    <p><strong>2.</strong> Copia cada mensaje usando el botón "Copiar"</p>
+                    <p><strong>3.</strong> Busca el contacto y pega el mensaje personalizado</p>
+                    <p><strong>4.</strong> Envía el mensaje y repite con el siguiente</p>
+                  </div>
+                  
+                  <h2>💬 Mensajes Personalizados (${contacts.length} contactos)</h2>
+                  
+                  ${result.results.map((item: any, index: number) => `
+                    <div class="message-block">
+                      <div class="contact-header">
+                        ${index + 1}. ${item.contact} - ${item.phone}
+                      </div>
+                      <div id="message-${index}">
+                        ${item.personalizedMessage.replace(/\n/g, '<br>')}
+                      </div>
+                      <button class="copy-btn" onclick="copyMessage(${index})">
+                        📋 Copiar Mensaje
+                      </button>
+                    </div>
+                  `).join('')}
+                  
+                  <script>
+                    function copyMessage(index) {
+                      const messageElement = document.getElementById('message-' + index);
+                      const text = messageElement.innerText;
+                      navigator.clipboard.writeText(text).then(() => {
+                        const btn = event.target;
+                        btn.textContent = '✅ Copiado!';
+                        btn.style.background = '#4CAF50';
+                        setTimeout(() => {
+                          btn.textContent = '📋 Copiar Mensaje';
+                          btn.style.background = '#25D366';
+                        }, 2000);
+                      });
+                    }
+                  </script>
+                </body>
+              </html>
+            `)
+            newWindow.document.close()
+          }
+        } else {
+          setCurrentProgress("¡Envío automático completado!")
+        }
       } else {
-        const error = await response.json()
-        setCurrentProgress(`Error: ${error.error}`)
-        alert(`Error: ${error.error}`)
+        setCurrentProgress(`Error: ${result.error}`)
+        console.error('Error:', result.error)
       }
     } catch (error) {
-      setCurrentProgress("Error en el envío automático")
-      alert('Error en el proceso de envío')
+      setCurrentProgress("Error en el proceso de envío")
+      console.error('Error:', error)
     } finally {
       setIsSending(false)
     }
@@ -126,6 +217,16 @@ export default function WhatsAppBulkMessenger() {
               <Badge variant={isSending ? "destructive" : "default"} className="text-sm">
                 {isSending ? "Enviando..." : "Listo para enviar"}
               </Badge>
+              {typeof window !== 'undefined' && window.location.hostname.includes('vercel') && (
+                <Badge variant="outline" className="text-sm border-orange-300 text-orange-700 dark:text-orange-300">
+                  🌐 Modo Producción (Manual)
+                </Badge>
+              )}
+              {typeof window !== 'undefined' && window.location.hostname.includes('localhost') && (
+                <Badge variant="outline" className="text-sm border-green-300 text-green-700 dark:text-green-300">
+                  🔧 Modo Desarrollo (Automático)
+                </Badge>
+              )}
             </div>
           </div>
 

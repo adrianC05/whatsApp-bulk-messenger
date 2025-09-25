@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +11,68 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // En producción (Vercel), Puppeteer no funciona debido a limitaciones serverless
+    if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+      console.log('🌐 Detectado entorno de producción - usando modo manual...');
+      
+      return NextResponse.json({
+        error: 'Funcionalidad no disponible en producción',
+        message: `
+⚠️ LIMITACIÓN DE VERCEL ⚠️
+
+La automatización de WhatsApp con Puppeteer no funciona en entornos serverless como Vercel debido a:
+
+• No se pueden ejecutar procesos de navegador persistentes  
+• Limitaciones de tiempo de ejecución (10-15 segundos máximo)
+• No hay acceso al sistema de archivos para Chrome
+
+🔧 SOLUCIONES ALTERNATIVAS:
+
+1. **Desarrollo Local**: Funciona perfectamente en tu máquina
+2. **VPS/Servidor Dedicado**: Deploy en Railway, DigitalOcean, etc.
+3. **Desktop App**: Convertir a app Electron  
+4. **Manual**: Usar las variables dinámicas para copiar/pegar mensajes
+
+📱 TUS MENSAJES PERSONALIZADOS:
+
+${contacts.map((contact: any, index: number) => `
+────────────────────────────────────
+${index + 1}. Para: ${contact.name}
+📱 Teléfono: ${contact.phone}
+────────────────────────────────────
+
+${message
+  .replace(/\[NOMBRE\]/g, contact.name)
+  .replace(/\[PHONE\]/g, contact.phone)  
+  .replace(/\[EMAIL\]/g, contact.email || '[EMAIL]')
+  .replace(/\[COMPANY\]/g, contact.company || '[COMPANY]')
+  .replace(/\[NOTES\]/g, contact.notes || '[NOTES]')
+  .replace(/\[FECHA\]/g, new Date().toLocaleDateString('es-ES'))
+}
+
+`).join('\n')}
+
+💡 Copia cada mensaje y pégalo manualmente en WhatsApp Web.
+🌐 Abre WhatsApp Web: https://web.whatsapp.com
+        `,
+        results: contacts.map((contact: any) => ({
+          contact: contact.name,
+          phone: contact.phone,
+          status: 'success',
+          message: 'Mensaje generado - Listo para copia manual',
+          personalizedMessage: message
+            .replace(/\[NOMBRE\]/g, contact.name)
+            .replace(/\[PHONE\]/g, contact.phone)
+            .replace(/\[EMAIL\]/g, contact.email || '[EMAIL]')
+            .replace(/\[COMPANY\]/g, contact.company || '[COMPANY]')
+            .replace(/\[NOTES\]/g, contact.notes || '[NOTES]')
+            .replace(/\[FECHA\]/g, new Date().toLocaleDateString('es-ES'))
+        }))
+      }, { status: 200 });
+    }
+
+    // Código para desarrollo local - importar Puppeteer solo si no estamos en producción
+    const puppeteer = await import('puppeteer');
     console.log('🚀 Iniciando proceso de envío automático...');
 
     let browser;
@@ -19,7 +80,7 @@ export async function POST(request: NextRequest) {
     try {
       // Intentar lanzar con Chrome del sistema primero
       console.log('🌐 Intentando lanzar Chrome del sistema...');
-      browser = await puppeteer.launch({
+      browser = await puppeteer.default.launch({
         headless: false,
         defaultViewport: null,
         executablePath: undefined, // Usar Chrome del sistema
@@ -46,7 +107,7 @@ export async function POST(request: NextRequest) {
       
       try {
         // Fallback: usar Chrome descargado por Puppeteer
-        browser = await puppeteer.launch({
+        browser = await puppeteer.default.launch({
           headless: false,
           defaultViewport: null,
           args: [

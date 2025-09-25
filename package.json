@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build", 
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "if [ \"$VERCEL\" = \"1\" ]; then echo 'Skipping Puppeteer in production'; else echo 'Development build'; fi"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
