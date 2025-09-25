@@ -84,8 +84,9 @@ ${message
     try {
       // Configuración optimizada según el entorno
       const launchOptions = {
-        headless: isProduction ? 'new' as const : false,
+        headless: isProduction ? true : false,
         defaultViewport: null,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',

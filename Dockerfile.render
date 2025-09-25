@@ -1,0 +1,39 @@
+# Imagen más simple para Render.com
+FROM node:18-alpine
+
+# Instalar Chromium y dependencias básicas
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Configurar Puppeteer para usar Chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+WORKDIR /app
+
+# Copiar y instalar dependencias
+COPY package*.json ./
+RUN npm install --omit=dev --legacy-peer-deps
+
+# Copiar código fuente
+COPY . .
+
+# Build de Next.js
+RUN npm run build
+
+# Usuario no-root
+RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+RUN chown -R nextjs:nodejs /app
+USER nextjs
+
+EXPOSE 3000
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+CMD ["npm", "start"]
