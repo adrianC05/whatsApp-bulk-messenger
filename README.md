@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📱 Multi-WhatsApp Bulk Messenger
 
-## Getting Started
+Sistema avanzado de mensajería masiva para WhatsApp Web con variables dinámicas y personalización automática.
 
-First, run the development server:
+## ✨ Características
 
+- 🔄 **Variables Dinámicas**: `[NOMBRE]`, `[PHONE]`, `[EMAIL]`, `[COMPANY]`, `[NOTES]`, `[FECHA]`
+- 📱 **Automatización Completa**: Control de WhatsApp Web via Puppeteer
+- 👥 **Gestión de Contactos**: Individual y en lote (CSV)
+- 🎯 **Mensajes Personalizados**: Cada contacto recibe su mensaje único
+- ⚡ **Envío por Bloques**: Todo el mensaje se envía como una unidad
+- 🔍 **Vista Previa**: Ve cómo se verá tu mensaje antes de enviarlo
+
+## 🚀 Despliegue
+
+### Desarrollo Local ✅ (Recomendado)
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+**✅ Funcionalidad completa con Puppeteer**
+
+### Producción en Vercel ⚠️ (Limitado)
+```bash
+vercel --prod
+```
+**⚠️ Solo genera mensajes para copia manual (sin automatización)**
+
+### Alternativas de Producción 🔧
+
+1. **Railway/DigitalOcean** - Servidores con soporte completo
+2. **Desktop App** - Convertir a Electron
+3. **Manual** - Usar variables para copiar/pegar
+
+## 📝 Uso de Variables
+
+```
+¡Hola [NOMBRE]! 👋
+
+Tenemos una oferta especial para [COMPANY] válida hasta [FECHA].
+
+📧 Responde a [EMAIL] para más información.
+📞 Tu número registrado: [PHONE]
+
+Notas: [NOTES]
+
+¡Saludos!
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tecnologías
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Next.js 14** - Framework React
+- **TypeScript** - Tipado estático  
+- **Tailwind CSS** - Estilos
+- **Puppeteer** - Automatización de navegador
+- **Radix UI** - Componentes accesibles
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ⚖️ Limitaciones
 
-## Learn More
+- **Vercel**: No soporta Puppeteer (serverless)
+- **Desarrollo**: Requiere Chrome instalado
+- **WhatsApp**: Sujeto a cambios en la interfaz web
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Desarrollado con ❤️ para automatizar tu comunicación
