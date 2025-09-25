@@ -9,6 +9,10 @@
     "lint": "next lint",
     "postinstall": "if [ \"$VERCEL\" = \"1\" ]; then echo 'Skipping Puppeteer in Vercel'; else echo 'Installing Puppeteer for production'; fi"
   },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "1.2.2",

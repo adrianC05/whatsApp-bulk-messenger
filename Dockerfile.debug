@@ -1,0 +1,57 @@
+# Debug Dockerfile para verificar archivos
+FROM node:18-alpine
+
+# Instalar dependencias del sistema necesarias para Puppeteer
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Configurar variables de entorno para Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    NODE_ENV=production
+
+# Crear directorio de la aplicación
+WORKDIR /app
+
+# Copiar archivos de configuración de paquetes
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm install
+
+# Copiar TODO el código fuente
+COPY . .
+
+# Verificar que los archivos están ahí
+RUN echo "=== Verificando archivos copiados ===" && \
+    ls -la components/ && \
+    echo "=== Verificando components/ui ===" && \
+    ls -la components/ui/ && \
+    echo "=== Verificando tsconfig.json ===" && \
+    cat tsconfig.json && \
+    echo "=== Fin verificación ==="
+
+# Crear usuario no-root para seguridad
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001
+
+# Cambiar ownership de los archivos
+RUN chown -R nextjs:nodejs /app
+
+# Construir la aplicación
+RUN npm run build
+
+# Cambiar a usuario no-root
+USER nextjs
+
+# Exponer puerto
+EXPOSE 3000
+
+# Comando para iniciar la aplicación
+CMD ["npm", "start"]

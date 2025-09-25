@@ -162,11 +162,11 @@ ${message
           isAuthenticated = true;
         } else {
           console.log('⏳ Esperando autenticación...');
-          await page.waitForTimeout(2000);
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       } catch (error) {
         console.log('Error verificando autenticación:', error);
-        await page.waitForTimeout(2000);
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
 
@@ -203,7 +203,7 @@ ${message
         // Limpiar búsqueda anterior
         await searchBox.click({ clickCount: 3 });
         await searchBox.type(contact.phone);
-        await page.waitForTimeout(2000);
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
         // Verificar si el contacto existe
         const contactFound = await page.evaluate(() => {
@@ -225,7 +225,7 @@ ${message
           // Hacer clic en el primer resultado
           console.log(`📱 Contacto encontrado: ${contact.name}`);
           await page.click('[data-testid="chat-list"] > div:first-child');
-          await page.waitForTimeout(1000);
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
         // Esperar que aparezca el cuadro de mensaje
@@ -238,7 +238,7 @@ ${message
         // Escribir mensaje
         console.log(`💬 Escribiendo mensaje personalizado...`);
         await messageBox.click();
-        await page.waitForTimeout(500);
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // Limpiar y escribir mensaje
         await page.keyboard.down('Control');
@@ -256,14 +256,14 @@ ${message
           }
         }
 
-        await page.waitForTimeout(timingSettings.messageDelay * 1000);
+        await new Promise(resolve => setTimeout(resolve, timingSettings.messageDelay * 1000));
 
         // Enviar mensaje
         console.log(`📤 Enviando mensaje...`);
         await page.keyboard.press('Enter');
         
         // Esperar confirmación de envío
-        await page.waitForTimeout(timingSettings.sendDelay * 1000);
+        await new Promise(resolve => setTimeout(resolve, timingSettings.sendDelay * 1000));
 
         console.log(`✅ Mensaje enviado exitosamente a ${contact.name}`);
         results.push({
@@ -276,7 +276,7 @@ ${message
         // Pausa entre contactos (excepto el último)
         if (i < contacts.length - 1) {
           console.log(`⏳ Esperando ${timingSettings.chatDelay}s antes del siguiente contacto...`);
-          await page.waitForTimeout(timingSettings.chatDelay * 1000);
+          await new Promise(resolve => setTimeout(resolve, timingSettings.chatDelay * 1000));
         }
 
       } catch (contactError) {
