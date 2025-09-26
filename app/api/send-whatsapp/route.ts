@@ -79,46 +79,66 @@ ${message
     const puppeteer = await import('puppeteer');
     console.log('🚀 Iniciando proceso de envío automático completo...');
 
+    // Configuración optimizada según el entorno
+    const launchOptions = {
+      headless: isProduction ? true : false,
+      defaultViewport: null,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor',
+        ...(isProduction ? [
+          '--disable-background-timer-throttling',
+          '--disable-backgrounding-occluded-windows',
+          '--disable-renderer-backgrounding',
+          '--disable-extensions',
+          '--disable-plugins',
+          '--disable-default-apps',
+          '--disable-background-networking'
+        ] : [
+          '--start-maximized'
+        ]),
+        '--user-data-dir=./chrome-user-data'
+      ],
+      timeout: 60000
+    };
+
     let browser;
     
     try {
-      // Configuración optimizada según el entorno
-      const launchOptions = {
-        headless: isProduction ? true : false,
-        defaultViewport: null,
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--no-first-run',
-          '--no-zygote',
-          '--disable-gpu',
-          '--disable-web-security',
-          '--disable-features=VizDisplayCompositor',
-          ...(isProduction ? [
-            '--disable-background-timer-throttling',
-            '--disable-backgrounding-occluded-windows',
-            '--disable-renderer-backgrounding',
-            '--disable-extensions',
-            '--disable-plugins',
-            '--disable-default-apps',
-            '--disable-background-networking'
-          ] : [
-            '--start-maximized'
-          ]),
-          '--user-data-dir=./chrome-user-data'
-        ],
-        timeout: 60000
-      };
-
       console.log(`🌐 Lanzando navegador en modo ${isProduction ? 'headless' : 'visible'}...`);
       browser = await puppeteer.default.launch(launchOptions);
       console.log('✅ Navegador lanzado correctamente');
     } catch (launchError) {
       console.error('❌ Error lanzando navegador:', launchError);
-      throw new Error(`Failed to launch browser: ${launchError instanceof Error ? launchError.message : 'Error desconocido'}`);
+      
+      // Si el error indica que Chrome no se encuentra, intentar instalarlo
+      if (launchError instanceof Error && launchError.message.includes('Could not find Chrome')) {
+        console.log('🔧 Chrome no encontrado. Intentando instalar...');
+        
+        try {
+          const { execSync } = await import('child_process');
+          console.log('📦 Instalando Chrome...');
+          execSync('npx puppeteer browsers install chrome', { stdio: 'inherit' });
+          console.log('✅ Chrome instalado correctamente. Reintentando...');
+          
+          // Reintentar lanzar el navegador
+          browser = await puppeteer.default.launch(launchOptions);
+          console.log('✅ Navegador lanzado correctamente después de instalar Chrome');
+        } catch (installError) {
+          console.error('❌ Error instalando Chrome:', installError);
+          throw new Error(`Failed to install Chrome: ${installError instanceof Error ? installError.message : 'Error desconocido'}`);
+        }
+      } else {
+        throw new Error(`Failed to launch browser: ${launchError instanceof Error ? launchError.message : 'Error desconocido'}`);
+      }
     }
 
     const page = await browser.newPage();
